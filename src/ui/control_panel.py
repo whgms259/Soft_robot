@@ -8,6 +8,8 @@ from tkinter import ttk
 from typing import Callable
 
 from .models import (
+    DRIVE_SPEED_DEFAULT,
+    DRIVE_SPEED_STEP,
     UPDATE_INTERVAL_MS,
     WINDING_SPEED_MIN,
     WINDING_SPEED_STEP,
@@ -15,6 +17,7 @@ from .models import (
     DriveDirection,
     WheelUiState,
     WindingGaugeState,
+    clamp_drive_speed,
     clamp_winding_speed,
 )
 from .widgets import ToggleSwitch, WindingGauge
@@ -31,6 +34,7 @@ class VariableWheelControlApp(ttk.Frame):
     ) -> None:
         super().__init__(master, padding=24)
         self._on_state_change = on_state_change
+        self._drive_speed = DRIVE_SPEED_DEFAULT
         self._winding_state = WindingGaugeState()
         self._winding_speed = WINDING_SPEED_MIN
         self._moving_to_target = False
@@ -49,6 +53,7 @@ class VariableWheelControlApp(ttk.Frame):
                 if self._drive_direction.is_right
                 else DriveDirection.FORWARD
             ),
+            drive_speed=self._drive_speed,
             adjustment_enabled=self._adjustment_enabled.is_right,
             adjustment_direction=(
                 AdjustmentDirection.WIND
@@ -60,6 +65,10 @@ class VariableWheelControlApp(ttk.Frame):
     @property
     def winding_state(self) -> WindingGaugeState:
         return self._winding_state
+
+    @property
+    def drive_speed(self) -> float:
+        return self._drive_speed
 
     @property
     def winding_speed(self) -> float:
@@ -115,7 +124,14 @@ class VariableWheelControlApp(ttk.Frame):
             right="-",
             command=self._update_status,
         )
-        self._drive_direction.pack(fill=tk.X)
+        self._drive_direction.pack(fill=tk.X, pady=(0, 18))
+        self._drive_speed_text = self._build_speed_control(
+            frame,
+            title="주행 속도",
+            initial_value=self._drive_speed,
+            step=DRIVE_SPEED_STEP,
+            on_change=self._change_drive_speed,
+        )
 
     def _build_adjustment_controls(self, master: ttk.Frame) -> None:
         frame = self._motor_frame(master, "조절 모터", column=1, padx=(8, 0))
@@ -143,7 +159,14 @@ class VariableWheelControlApp(ttk.Frame):
         )
         self._winding_gauge.pack(fill=tk.X)
         self._build_target_buttons(frame)
-        self._build_speed_control(frame)
+        self._winding_speed_text = self._build_speed_control(
+            frame,
+            title="이동 속도",
+            initial_value=self._winding_speed,
+            step=WINDING_SPEED_STEP,
+            on_change=self._change_winding_speed,
+            pady=(14, 7),
+        )
 
     def _motor_frame(
         self,
@@ -200,12 +223,21 @@ class VariableWheelControlApp(ttk.Frame):
             command=self._reset_winding_target,
         ).grid(row=0, column=1, sticky="ew", padx=(4, 0))
 
-    def _build_speed_control(self, master: ttk.LabelFrame) -> None:
+    def _build_speed_control(
+        self,
+        master: ttk.LabelFrame,
+        *,
+        title: str,
+        initial_value: float,
+        step: float,
+        on_change: Callable[[float], None],
+        pady: tuple[int, int] = (0, 7),
+    ) -> tk.StringVar:
         ttk.Label(
             master,
-            text="이동 속도",
+            text=title,
             style="ControlLabel.TLabel",
-        ).pack(anchor=tk.W, pady=(14, 7))
+        ).pack(anchor=tk.W, pady=pady)
         frame = ttk.Frame(master)
         frame.pack(fill=tk.X)
         frame.columnconfigure(1, weight=1)
@@ -213,12 +245,12 @@ class VariableWheelControlApp(ttk.Frame):
             frame,
             text="◀",
             width=4,
-            command=lambda: self._change_winding_speed(-WINDING_SPEED_STEP),
+            command=lambda: on_change(-step),
         ).grid(row=0, column=0)
-        self._winding_speed_text = tk.StringVar(value=f"{self._winding_speed:.1f}")
+        speed_text = tk.StringVar(value=f"{initial_value:.1f}")
         ttk.Label(
             frame,
-            textvariable=self._winding_speed_text,
+            textvariable=speed_text,
             anchor=tk.CENTER,
             style="Status.TLabel",
         ).grid(row=0, column=1, sticky="ew")
@@ -226,8 +258,9 @@ class VariableWheelControlApp(ttk.Frame):
             frame,
             text="▶",
             width=4,
-            command=lambda: self._change_winding_speed(WINDING_SPEED_STEP),
+            command=lambda: on_change(step),
         ).grid(row=0, column=2)
+        return speed_text
 
     def _build_status(self) -> None:
         frame = ttk.LabelFrame(
@@ -280,6 +313,11 @@ class VariableWheelControlApp(ttk.Frame):
     def _change_winding_speed(self, delta: float) -> None:
         self._winding_speed = clamp_winding_speed(self._winding_speed + delta)
         self._winding_speed_text.set(f"{self._winding_speed:.1f}")
+
+    def _change_drive_speed(self, delta: float) -> None:
+        self._drive_speed = clamp_drive_speed(self._drive_speed + delta)
+        self._drive_speed_text.set(f"{self._drive_speed:.1f}")
+        self._update_status()
 
     def _set_target_movement_active(self, active: bool) -> None:
         self._moving_to_target = active

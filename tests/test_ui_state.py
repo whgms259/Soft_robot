@@ -4,6 +4,9 @@ import unittest
 
 from src.ui.models import (
     AdjustmentDirection,
+    DRIVE_SPEED_DEFAULT,
+    DRIVE_SPEED_MAX,
+    DRIVE_SPEED_MIN,
     DriveDirection,
     WINDING_MAX,
     WINDING_MIN,
@@ -11,6 +14,7 @@ from src.ui.models import (
     WINDING_SPEED_MIN,
     WindingGaugeState,
     WheelUiState,
+    clamp_drive_speed,
     clamp_winding_speed,
 )
 
@@ -21,6 +25,7 @@ class WheelUiStateTests(unittest.TestCase):
 
         self.assertFalse(state.drive_enabled)
         self.assertEqual(state.drive_direction, DriveDirection.FORWARD)
+        self.assertEqual(state.drive_speed, DRIVE_SPEED_DEFAULT)
         self.assertFalse(state.adjustment_enabled)
         self.assertEqual(state.adjustment_direction, AdjustmentDirection.UNWIND)
 
@@ -28,6 +33,7 @@ class WheelUiStateTests(unittest.TestCase):
         state = WheelUiState(
             drive_enabled=True,
             drive_direction=DriveDirection.REVERSE,
+            drive_speed=1.7,
             adjustment_enabled=True,
             adjustment_direction=AdjustmentDirection.WIND,
         )
@@ -41,6 +47,11 @@ class WheelUiStateTests(unittest.TestCase):
                 "조절 방향: 감기",
             ),
         )
+
+    def test_drive_speed_is_clamped_and_rounded_to_one_decimal_place(self) -> None:
+        self.assertEqual(clamp_drive_speed(0.0), DRIVE_SPEED_MIN)
+        self.assertEqual(clamp_drive_speed(2.1), DRIVE_SPEED_MAX)
+        self.assertEqual(clamp_drive_speed(1.2000000000000002), 1.2)
 
 
 class WindingGaugeStateTests(unittest.TestCase):

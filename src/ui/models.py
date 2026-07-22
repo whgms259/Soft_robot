@@ -8,6 +8,10 @@ from enum import Enum
 
 GAUGE_DISPLAY_MIN = 0.0
 GAUGE_DISPLAY_MAX = 10.0
+DRIVE_SPEED_MIN = 0.5
+DRIVE_SPEED_MAX = 2.0
+DRIVE_SPEED_DEFAULT = 1.0
+DRIVE_SPEED_STEP = 0.1
 WINDING_MIN = 0.5
 WINDING_MAX = 9.5
 WINDING_SPEED_MIN = 0.1
@@ -38,6 +42,7 @@ class WheelUiState:
     drive_direction: DriveDirection = DriveDirection.FORWARD
     adjustment_enabled: bool = False
     adjustment_direction: AdjustmentDirection = AdjustmentDirection.UNWIND
+    drive_speed: float = DRIVE_SPEED_DEFAULT
 
     def status_lines(self) -> tuple[str, str, str, str]:
         """화면 표시용 상태 문구를 반환한다."""
@@ -104,6 +109,13 @@ def clamp_winding(value: float) -> float:
     """감김 위치를 simulation 이동 범위로 제한한다."""
 
     return min(WINDING_MAX, max(WINDING_MIN, value))
+
+
+def clamp_drive_speed(value: float) -> float:
+    """주행 속도를 허용 범위와 0.1 단위로 제한한다."""
+
+    clamped = min(DRIVE_SPEED_MAX, max(DRIVE_SPEED_MIN, value))
+    return round(clamped, 1)
 
 
 def clamp_winding_speed(value: float) -> float:

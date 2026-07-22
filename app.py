@@ -7,6 +7,10 @@ import tkinter as tk
 
 from src.ui.control_panel import VariableWheelControlApp
 from src.ui.models import (
+    DRIVE_SPEED_DEFAULT,
+    DRIVE_SPEED_MAX,
+    DRIVE_SPEED_MIN,
+    DRIVE_SPEED_STEP,
     GAUGE_DISPLAY_MAX,
     GAUGE_DISPLAY_MIN,
     UPDATE_INTERVAL_MS,
@@ -25,6 +29,10 @@ from src.ui.widgets import ToggleSwitch, WindingGauge
 
 __all__ = [
     "AdjustmentDirection",
+    "DRIVE_SPEED_DEFAULT",
+    "DRIVE_SPEED_MAX",
+    "DRIVE_SPEED_MIN",
+    "DRIVE_SPEED_STEP",
     "DriveDirection",
     "GAUGE_DISPLAY_MAX",
     "GAUGE_DISPLAY_MIN",
