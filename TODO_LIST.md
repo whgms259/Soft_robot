@@ -36,7 +36,8 @@
 - [x] GitHub `whgms259/Soft_robot` 저장소를 `origin`으로 연결한다.
 - [x] GitHub 일반 파일 크기 제한을 초과하는 kickoff PDF를 사용자 요청에 따라 삭제한다.
 - [x] Python cache, 가상환경, IDE 설정과 test 산출물을 `.gitignore`로 제외한다.
-- [ ] Git commit 작성자 이름·email을 설정하고 initial commit을 `origin/main`에 push한다.
+- [x] Git commit 작성자 이름·email을 저장소 local 설정으로 지정하고 initial commit을 `origin/main`에 push한다.
+- [x] `main`을 기반으로 `UI_0.0.1` branch를 생성하고 UI code와 test를 `origin/UI_0.0.1`에 push한다.
 
 완료 조건: 미정 hardware/interface 항목이 기록되어야 한다. hardware와 독립적인 단일 가변 휠 module은 명시적인 test 설정을 주입해 먼저 진행할 수 있으며, 실제 통신과 motor 제어는 연결 방식과 안전값이 승인된 뒤 진행한다.
 

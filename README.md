@@ -176,13 +176,14 @@ python -m unittest discover -s tests -v
 
 ### GitHub 연동 상태
 
-- local Git branch: `main`
+- 기반 branch: `main` (`.gitignore`, `AGENTS.md`, `README.md`, `TODO_LIST.md`)
+- UI 작업 branch: `UI_0.0.1` (`app.py`, `run_ui.py`, `src/`, `tests/`)
 - remote 이름: `origin`
 - remote 저장소: `https://github.com/whgms259/Soft_robot.git`
 - Python cache, 가상환경, IDE 설정과 test 산출물은 `.gitignore`에서 제외한다.
 - GitHub 일반 파일 크기 제한을 초과한 약 134.9MB의 kickoff PDF는 사용자 요청에 따라 project에서 삭제했다.
-- 원격 저장소는 연결 시점에 commit이 없는 빈 저장소로 확인했다.
-- Git commit 작성자 이름과 email이 설정되지 않아 initial commit과 push는 아직 수행하지 않았다.
+- `main`의 기반 commit과 `UI_0.0.1`의 UI prototype commit을 각각 원격 branch에 push했다.
+- Git commit 작성자는 이 저장소의 local 설정으로 관리한다.
 
 ### UI 구현 중 수정된 문제
 
